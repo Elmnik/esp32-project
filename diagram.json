@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "author": "SICC Team - UNI",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0 },
+    { "type": "wokwi-dht22", "id": "dht", "top": -180, "left": 120 },
+    { "type": "wokwi-potentiometer", "id": "soil", "top": 180, "left": 120, "attrs": { "label": "Humedad Suelo" } },
+    { "type": "wokwi-led", "id": "led_pump", "top": -50, "left": 250, "attrs": { "color": "blue", "label": "Bomba Riego" } },
+    { "type": "wokwi-led", "id": "led_fan", "top": 50, "left": 250, "attrs": { "color": "green", "label": "Ventilador" } },
+    { "type": "wokwi-resistor", "id": "r1", "top": -10, "left": 200, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r2", "top": 90, "left": 200, "attrs": { "value": "220" } }
+  ],
+  "connections": [
+    [ "esp:GND.1", "dht:GND", "black", [ "v0" ] ],
+    [ "esp:3V3", "dht:VCC", "red", [ "v0" ] ],
+    [ "esp:D15", "dht:SDA", "yellow", [ "v0" ] ],
+    
+    [ "esp:GND.2", "soil:GND", "black", [ "v0" ] ],
+    [ "esp:3V3", "soil:VCC", "red", [ "v0" ] ],
+    [ "esp:D32", "soil:SIG", "orange", [ "v0" ] ],
+    
+    [ "esp:D18", "r1:1", "blue", [ "v0" ] ],
+    [ "r1:2", "led_pump:A", "blue", [ "v0" ] ],
+    [ "esp:GND.3", "led_pump:C", "black", [ "v0" ] ],
+    
+    [ "esp:D19", "r2:1", "green", [ "v0" ] ],
+    [ "r2:2", "led_fan:A", "green", [ "v0" ] ],
+    [ "esp:GND.3", "led_fan:C", "black", [ "v0" ] ]
+  ]
+}

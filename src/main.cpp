@@ -93,7 +93,7 @@ void reconnect() {
     String clientId = "SICC-Fatima-Client-";
     clientId += String(random(0xffff), HEX);
     
-    if (client.connect(clientId.c_address())) {
+    if (client.connect(clientId.c_str())) {
       Serial.println("Conectado");
       client.subscribe("finca/fatima/control/#");
     } else {
@@ -133,3 +133,12 @@ void publishTelemetry() {
     client.publish("finca/fatima/telemetria", buffer);
     Serial.println("Datos publicados: " + String(buffer));
 }
+
+//Incluir logica para control de ventilador si es necesario
+//Actualmente solo se controla la bomba de riego basado en la humedad del suelo
+//El ventilador se activa/desactiva basado en la temperatura del aire
+//Ajustar los umbrales según las necesidades específicas del cultivo de aguacate
+//Considerar agregar más sensores o actuadores según los requerimientos del sistema SICC
+//Implementar seguridad adicional para la conexión MQTT si se va a usar en producción
+//Monitorear el rendimiento y la estabilidad del sistema en el entorno real de la finca.
+//Optimizar el consumo energético si el sistema va a funcionar con baterías o energía solar.
