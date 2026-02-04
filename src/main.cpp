@@ -1,3 +1,4 @@
+-- Active: 1708546225065@@MacBook-Air-de-Elmer.local@5432
 /**
  * @file main.cpp
  * @brief Sistema Inteligente de Control Climático (SICC) - Finca La Fátima
