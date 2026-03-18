@@ -30,7 +30,7 @@ PubSubClient client(espClient);
 unsigned long lastMsg = 0;
 float t_aire = 0, h_aire = 0, porc_humedad_suelo = 0;
 
-// --- Prototipos de Funciones ---
+// --- Funciones ---
 void setup_wifi();
 void callback(char* topic, byte* payload, unsigned int length);
 void reconnect();
@@ -41,7 +41,7 @@ void setup() {
   Serial.begin(115200);
   pinMode(RELAY_PUMP, OUTPUT);
   pinMode(RELAY_FAN, OUTPUT);
-  delay(2000); // <--- IMPORTANTE: Da tiempo al monitor para conectar
+  delay(2000);
   Serial.println("================================");
   Serial.println("   FINCA LA FATIMA INICIANDO    ");
   Serial.println("================================");
@@ -53,12 +53,10 @@ void setup() {
 }
 
 void loop() {
-  // Verificación constante de WiFi
   if (WiFi.status() != WL_CONNECTED) {
     setup_wifi();
   }
 
-  // Verificación de conexión MQTT
   if (!client.connected()) {
     reconnect();
   }
@@ -96,7 +94,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
   
   Serial.println("Comando remoto recibido [" + String(topic) + "]: " + message);
 
-  // La lógica de sensores sobreescribirá esto en el siguiente ciclo)
   if (String(topic) == "finca/fatima/control/riego") {
     digitalWrite(RELAY_PUMP, (message == "ON") ? HIGH : LOW);
   }
@@ -110,7 +107,6 @@ void reconnect() {
     Serial.print("Intentando conexión MQTT...");
     String clientId = "SICC-Fatima-" + String(random(0xffff), HEX);
     
-    // Conexión con "Last Will" para monitorear si el equipo se desconecta bruscamente
     if (client.connect(clientId.c_str(), "finca/fatima/estado", 0, true, "OFFLINE")) {
       Serial.println("Conectado");
       client.publish("finca/fatima/estado", "ONLINE", true);
@@ -140,18 +136,16 @@ void loopControlAguacate() {
     porc_humedad_suelo = map(h_suelo_raw, 4095, 0, 0, 100);
 
     // Lógica de Histéresis 
-    if (porc_humedad_suelo < 60.0) digitalWrite(RELAY_PUMP, HIGH); // Si la humedad del suelo es menor al 60%, activamos el riego
-    else if (porc_humedad_suelo > 75.0) digitalWrite(RELAY_PUMP, LOW); // Si la humedad del suelo es mayor al 75%, desactivamos el riego
+    if (porc_humedad_suelo < 60.0) digitalWrite(RELAY_PUMP, HIGH); 
+    else if (porc_humedad_suelo > 75.0) digitalWrite(RELAY_PUMP, LOW); 
 
-    if (t_aire > 26.0) digitalWrite(RELAY_FAN, HIGH); // Si la temperatura del aire es mayor a 26°C, activamos el ventilador
-    else if (t_aire < 23.0) digitalWrite(RELAY_FAN, LOW); // Si la temperatura del aire es menor a 23°C, desactivamos el ventilador
+    if (t_aire > 26.0) digitalWrite(RELAY_FAN, HIGH); 
+    else if (t_aire < 23.0) digitalWrite(RELAY_FAN, LOW);
 }
 
 void publishTelemetry() {
-    // 1. Creamos el documento JSON
     StaticJsonDocument<256> doc;
     
-    // 2. Metemos los datos usando tus variables actuales (t_aire, h_aire, etc.)
     doc["temp"] = t_aire;
     doc["hum_aire"] = h_aire;
     doc["hum_suelo"] = porc_humedad_suelo;
@@ -159,14 +153,9 @@ void publishTelemetry() {
     doc["ventilador"] = digitalRead(RELAY_FAN);
     doc["wifi_rssi"] = WiFi.RSSI();
 
-    // 3. Lo convertimos a un formato que el MQTT entiende (buffer)
     char buffer[256];
     serializeJson(doc, buffer);
-    
-    // 4. Enviamos el contenido de "buffer"
     client.publish("finca/fatima/telemetria", buffer);
-    
-    // 5. Imprimimos en el monitor para estar seguros
     Serial.print("Telemetría enviada: ");
     Serial.println(buffer);
 }
