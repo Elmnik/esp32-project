@@ -41,6 +41,10 @@ void setup() {
   Serial.begin(115200);
   pinMode(RELAY_PUMP, OUTPUT);
   pinMode(RELAY_FAN, OUTPUT);
+  delay(2000); // <--- IMPORTANTE: Da tiempo al monitor para conectar
+  Serial.println("================================");
+  Serial.println("   FINCA LA FATIMA INICIANDO    ");
+  Serial.println("================================");
   
   dht.begin();
   setup_wifi();
@@ -144,7 +148,10 @@ void loopControlAguacate() {
 }
 
 void publishTelemetry() {
+    // 1. Creamos el documento JSON
     StaticJsonDocument<256> doc;
+    
+    // 2. Metemos los datos usando tus variables actuales (t_aire, h_aire, etc.)
     doc["temp"] = t_aire;
     doc["hum_aire"] = h_aire;
     doc["hum_suelo"] = porc_humedad_suelo;
@@ -152,10 +159,16 @@ void publishTelemetry() {
     doc["ventilador"] = digitalRead(RELAY_FAN);
     doc["wifi_rssi"] = WiFi.RSSI();
 
+    // 3. Lo convertimos a un formato que el MQTT entiende (buffer)
     char buffer[256];
     serializeJson(doc, buffer);
+    
+    // 4. Enviamos el contenido de "buffer"
     client.publish("finca/fatima/telemetria", buffer);
-    Serial.println("Telemetría enviada: " + String(buffer));
+    
+    // 5. Imprimimos en el monitor para estar seguros
+    Serial.print("Telemetría enviada: ");
+    Serial.println(buffer);
 }
 
 /* Hemos configurado el ESP32 para gestionar un ambiente controlado. 
