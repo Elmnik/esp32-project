@@ -11,7 +11,7 @@
 #include "DHT.h"
 
 // --- Configuración de Red y MQTT ---
-const char* ssid = "Wokwi-GUEST"; // WiFi estándar de Wokwi
+const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 const char* mqtt_server = "broker.emqx.io"; // Broker público para pruebas
 
@@ -89,7 +89,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
   while (!client.connected()) {
     Serial.print("Intentando conexión MQTT...");
-    // ID de cliente único para evitar colisiones en el broker público
     String clientId = "SICC-Fatima-Client-";
     clientId += String(random(0xffff), HEX);
     
@@ -109,7 +108,6 @@ void loopControlAguacate() {
     t_aire = dht.readTemperature();
     h_aire = dht.readHumidity();
     
-    // Normalización para Wokwi (ADC 12 bits)
     porc_humedad_suelo = map(h_suelo_raw, 4095, 0, 0, 100);
 
     // Lógica de Histéresis
@@ -134,11 +132,14 @@ void publishTelemetry() {
     Serial.println("Datos publicados: " + String(buffer));
 }
 
-//Incluir logica para control de ventilador si es necesario
-//Actualmente solo se controla la bomba de riego basado en la humedad del suelo
-//El ventilador se activa/desactiva basado en la temperatura del aire
-//Ajustar los umbrales según las necesidades específicas del cultivo de aguacate
-//Considerar agregar más sensores o actuadores según los requerimientos del sistema SICC
-//Implementar seguridad adicional para la conexión MQTT si se va a usar en producción
-//Monitorear el rendimiento y la estabilidad del sistema en el entorno real de la finca.
-//Optimizar el consumo energético si el sistema va a funcionar con baterías o energía solar.
+/* Hemos configurado el ESP32 para gestionar un ambiente controlado. 
+El LED Verde actúa como un actuador de climatización: 
+si la temperatura sube de 24°C, el sistema activa el enfriamiento. 
+Por otro lado, el LED Azul gestiona el nivel de hidratación: 
+si la humedad cae por debajo del 40%, se activa el sistema de riego (LeD Azul) */
+
+/* Además del control de temperatura y humedad, 
+incluímos una medida de seguridad. Ese componente que parece una báscula 
+mide el peso del tanque de agua. Si el peso baja de cierto nivel (cuando muevo la perilla),
+ el LED Azul se enciende para avisar que, aunque la planta necesite riego, 
+ el tanque está vacío y hay que rellenarlo */
