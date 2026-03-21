@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>La Fátima — simulator telemetry</title>
+	<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+	<div class="page">
+		<header>
+			<h1 class="title-row">
+				<span class="title-icon" data-lucide="layout-dashboard" aria-hidden="true"></span>
+				<span>La Fátima — simulator telemetry</span>
+			</h1>
+			<p>Live data from MQTT topic <code>finca/fatima/telemetria</code> (same broker as the ESP32 / Wokwi build).</p>
+		</header>
+
+		<div class="status-bar" role="status">
+			<div class="status-item">
+				<span class="status-dot" id="conn-dot" aria-hidden="true"></span>
+				<strong>MQTT:</strong> <span id="conn-label">Starting…</span>
+			</div>
+			<div class="status-item">
+				<strong>Device:</strong> <span id="val-device">—</span>
+			</div>
+			<div class="status-item">
+				<strong>Last sample:</strong> <span id="val-updated">—</span>
+			</div>
+		</div>
+
+		<div class="grid">
+			<div class="card">
+				<label>Air temperature</label>
+				<div class="value"><span id="val-temp">—</span><span class="unit">°C</span></div>
+			</div>
+			<div class="card">
+				<label>Air humidity</label>
+				<div class="value"><span id="val-hum-aire">—</span><span class="unit">%</span></div>
+			</div>
+			<div class="card">
+				<label>Soil moisture</label>
+				<div class="value"><span id="val-hum-suelo">—</span><span class="unit">%</span></div>
+			</div>
+			<div class="card">
+				<label>Wi‑Fi RSSI</label>
+				<div class="value"><span id="val-rssi">—</span><span class="unit">dBm</span></div>
+			</div>
+			<div class="card">
+				<label>Pump</label>
+				<div class="value"><span id="val-pump">—</span></div>
+			</div>
+			<div class="card">
+				<label>Fan</label>
+				<div class="value"><span id="val-fan">—</span></div>
+			</div>
+		</div>
+
+		<p class="hint">
+			Run the Wokwi simulator with firmware that publishes to <code>broker.emqx.io</code>.
+			If values stay empty, open this folder with a local server, e.g.
+			<code>cd dashboard && python3 -m http.server 8765</code>
+			then visit <code>http://127.0.0.1:8765</code>.
+		</p>
+	</div>
+
+	<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+	<script src="https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js"></script>
+	<script>
+		if (typeof lucide !== "undefined") lucide.createIcons();
+	</script>
+	<script src="app.js"></script>
+</body>
+</html>
